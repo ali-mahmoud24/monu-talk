@@ -1,0 +1,18 @@
+Smart Study Buddy: Enhance the study app with AI-powered features such as intelligent content recommendations, adaptive quizzes, and personalized study schedules. The app can utilize machine learning algorithms to analyze user performance data and provide tailored study plans.
+
+
+AI-Driven Travel Planner: Enhance the travel planning app by integrating AI models to provide personalized travel recommendations. The app can analyze user preferences, travel history, and other relevant data to suggest destinations, activities, and attractions tailored to individual interests.
+
+
+Intelligent Personal Finance Manager: Enhance the personal finance app with AI-powered budgeting and expense analysis features. The app can leverage machine learning algorithms to categorize expenses, detect spending patterns, and offer personalized financial insights and recommendations.
+
+
+
+WEBSITE THAT PROVIDES RECOMNDATIONS AS A SERVICE
+https://www.algolia.com/
+
+
+FIREBASE ML
+Adding on-device recommendations to your app using TensorFlow and Firebase
+(Training pipelines - google analytics and more)
+https://www.youtube.com/watch?v=GzJ9oiCnjJw
