@@ -79,7 +79,8 @@ const ArtifactList = () => {
       id={artifact.id}
       name={artifact.name}
       description={artifact.description}
-      imageUrl={artifact.imageUrl}
+      imageUrls={artifact.imageUrlList}
+      // imageUrl={artifact.imageUrl}
       museumId={artifact.museumId}
       // onDelete={artifactDeletedHandler}
     />

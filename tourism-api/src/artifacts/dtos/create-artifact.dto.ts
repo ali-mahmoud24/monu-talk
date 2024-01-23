@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsArray, IsString, Length } from 'class-validator';
 
 export class CreateArtifactDto {
   @IsString()
@@ -11,6 +11,9 @@ export class CreateArtifactDto {
   // @Length()
   readonly description: string;
 
-  @IsString()
-  imageUrl: string = '';
+  // @IsString()
+  // imageUrl: string = '';
+
+  @IsArray()
+  imageUrlList: string[] = [];
 }

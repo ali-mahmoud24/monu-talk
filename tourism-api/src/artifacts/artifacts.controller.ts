@@ -6,23 +6,24 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 
-import { ParseMongoIdPipe } from '../mongo/pipes/parse-mongo-id.pipe';
-
-import { Artifact } from './schemas/artifact.schema';
+import { Artifact } from './entities/artifact.entity';
 
 import { ArtifactService } from './artifacts.service';
 
 import { CreateArtifactDto } from './dtos/create-artifact.dto';
 import { UpdateArtifactDto } from './dtos/update-artifact.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Controller('artifacts')
 export class ArtifactsController {
@@ -38,33 +39,42 @@ export class ArtifactsController {
 
   @Get('museums/:museumId')
   async findByMuseumId(
-    @Param('museumId', ParseMongoIdPipe) museumId: string,
+    @Param('museumId', ParseUUIDPipe) museumId: string,
   ): Promise<Artifact[]> {
     return this.artifactService.findArtifactsByMuseumId(museumId);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseMongoIdPipe) id: string): Promise<Artifact> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Artifact> {
     return this.artifactService.findArtifactById(id);
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('images'))
   async create(
     @Body()
     createArtifactDto: CreateArtifactDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFiles() images: Express.Multer.File[],
   ): Promise<Artifact> {
-    // Upload Image to Cloudinary
-    const { url } = await this.cloudinaryService.uploadFile(image);
-    createArtifactDto.imageUrl = url;
-
-    return this.artifactService.createArtifact(createArtifactDto);
+    return this.artifactService.createArtifact(createArtifactDto, images);
   }
+  // @Post()
+  // @UseInterceptors(FileInterceptor('image'))
+  // async create(
+  //   @Body()
+  //   createArtifactDto: CreateArtifactDto,
+  //   @UploadedFile() image: Express.Multer.File,
+  // ): Promise<Artifact> {
+  //   // Upload Image to Cloudinary
+  //   const { url } = await this.cloudinaryService.uploadFile(image);
+  //   createArtifactDto.imageUrl = url;
+
+  //   return this.artifactService.createArtifact(createArtifactDto);
+  // }
 
   @Patch(':id')
   async update(
-    @Param('id', ParseMongoIdPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body()
     updateArtifactDto: UpdateArtifactDto,
   ): Promise<Artifact> {
@@ -73,7 +83,7 @@ export class ArtifactsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseMongoIdPipe) id: string): Promise<void> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.artifactService.deleteArtifact(id);
   }
 }

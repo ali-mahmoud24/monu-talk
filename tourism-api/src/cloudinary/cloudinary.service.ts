@@ -22,6 +22,28 @@ export class CloudinaryService {
     });
   }
 
+  async uploadManyFiles(
+    files: Express.Multer.File[],
+  ): Promise<CloudinaryResponse[]> {
+    const uploadPromises: Promise<CloudinaryResponse>[] = [];
+
+    for (const file of files) {
+      const uploadPromise = this.uploadFile(file);
+      uploadPromises.push(uploadPromise);
+    }
+
+    try {
+      // Wait for all files to upload concurrently
+      const uploadedFiles: CloudinaryResponse[] =
+        await Promise.all(uploadPromises);
+      return uploadedFiles;
+    } catch (error) {
+      // Handle errors if any file fails to upload
+      console.error('Error uploading files:', error);
+      throw error;
+    }
+  }
+
   deleteFileByImageUrl(imageUrl: string): Promise<CloudinaryResponse> {
     const publicId = this.getPublicId(imageUrl);
 
@@ -35,6 +57,28 @@ export class CloudinaryService {
         },
       );
     });
+  }
+
+  async deleteManyFilesByImageUrl(
+    imageUrls: string[],
+  ): Promise<CloudinaryResponse[]> {
+    const deletePromises: Promise<CloudinaryResponse>[] = [];
+
+    for (const url of imageUrls) {
+      const deletePromise = this.deleteFileByImageUrl(url);
+      deletePromises.push(deletePromise);
+    }
+
+    try {
+      // Wait for all files to upload concurrently
+      const deletedFiles: CloudinaryResponse[] =
+        await Promise.all(deletePromises);
+      return deletedFiles;
+    } catch (error) {
+      // Handle errors if any file fails to upload
+      console.error('Error deleteing files:', error);
+      throw error;
+    }
   }
 
   getPublicId(imageUrl: string) {

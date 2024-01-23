@@ -8,44 +8,49 @@ import {
 import { InjectModel } from '@nestJs/mongoose';
 
 import mongoose, { Model } from 'mongoose';
-import { User } from './schemas/user.schema';
 
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcryptjs';
-import { SignUpDto } from './dtos/signup.dto';
+import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role, User } from './user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+
+    // @InjectModel(User.name)
+    // private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
 
   async signUp(
-    signUpDto: SignUpDto, // : Promise<{ token: string; id: string }>
+    registerDto: RegisterDto, // : Promise<{ token: string; id: string }>
   ) {
-    // const { firstName, lastName, email, password } = signUpDto;
+    const { firstName, lastName, email, password } = registerDto;
 
-    const { email, password } = signUpDto;
+    // const { email, password } = signUpDto;
 
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userRepository.findOneBy({ email });
     if (user) {
       throw new UnauthorizedException('Email already exists');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await this.userModel.create({
-      // firstName,
-      // lastName,
+    const newUser = await this.userRepository.save({
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
+      role: Role.CLIENT,
     });
 
-    const token = this.jwtService.sign({ id: newUser._id });
+    const token = this.jwtService.sign({ id: newUser.id });
 
     return { token, userId: newUser.id };
   }
@@ -55,19 +60,19 @@ export class AuthService {
   ) {
     const { email, password } = loginDto;
 
-    const loadedUser = await this.userModel.findOne({ email });
+    const loadedUser = await this.userRepository.findOneBy({ email });
     if (!loadedUser) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password.');
     }
     const isPasswordMatched = await bcrypt.compare(
       password,
       loadedUser.password,
     );
     if (!isPasswordMatched) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password.');
     }
 
-    const token = this.jwtService.sign({ id: loadedUser._id });
+    const token = this.jwtService.sign({ id: loadedUser.id });
 
     return { token, userId: loadedUser.id };
   }

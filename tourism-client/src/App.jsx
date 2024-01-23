@@ -7,6 +7,7 @@ import MuseumsPage from './pages/MuseumsPage';
 import ArtifactsPage from './pages/ArtifactsPage';
 import NewMuseumPage from './pages/NewMuseumPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 import {
   SignedInProtectedRoute,
@@ -27,6 +28,15 @@ function App() {
           element={
             <SignedInProtectedRoute>
               <LoginPage />
+            </SignedInProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <SignedInProtectedRoute>
+              <RegisterPage />
             </SignedInProtectedRoute>
           }
         />

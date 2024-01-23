@@ -1,29 +1,25 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 
-import { ParseMongoIdPipe } from '../mongo/pipes/parse-mongo-id.pipe';
-
-import { Museum } from './schemas/museum.schema';
-
+import { Museum } from './entities/museum.entity';
 import { MuseumService } from './museums.service';
 
 import { CreateMuseumDto } from './dtos/create-museum.dto';
 import { UpdateMuseumDto } from './dtos/update-museum.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { json } from 'stream/consumers';
 
 @Controller('museums')
 export class MuseumsController {
@@ -32,19 +28,13 @@ export class MuseumsController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.cloudinaryService.uploadFile(file);
-  }
-
   @Get()
   async findAll(): Promise<Museum[]> {
     return this.museumService.findMuseums();
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseMongoIdPipe) id: string): Promise<Museum> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Museum> {
     return this.museumService.findMuseumById(id);
   }
 
@@ -63,17 +53,25 @@ export class MuseumsController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
   async update(
-    @Param('id', ParseMongoIdPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body()
     updateMuseumDto: UpdateMuseumDto,
+    @UploadedFile() image: Express.Multer.File,
   ): Promise<Museum> {
-    return this.museumService.updateMuseum(id, updateMuseumDto);
+    // if (image) {
+    //   // Upload Image to Cloudinary
+    //   const { url } = await this.cloudinaryService.uploadFile(image);
+    //   updateMuseumDto.imageUrl = url;
+    // }
+
+    return this.museumService.updateMuseum(id, updateMuseumDto, image);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseMongoIdPipe) id: string): Promise<void> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.museumService.deleteMuseum(id);
   }
 }

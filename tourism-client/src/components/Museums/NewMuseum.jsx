@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { MultiInputTimeRangeField } from '@mui/x-date-pickers-pro/MultiInputTimeRangeField';
+
+import dayjs from 'dayjs';
+
 import {
   TextField,
   Button,
@@ -24,6 +30,9 @@ const newMuseumSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   location: Yup.string().required('Location is required'),
   categoryId: Yup.string().required('Catrgory is required'),
+  // openingTime: Yup.date().required('Opening Time is required'),
+  // closingTime: Yup.date().required('closing Time is required'),
+  timeRange: Yup.array().required('Time Range is required'),
   //   image: Yup.mixed().required('Image is required'),
 });
 
@@ -69,6 +78,7 @@ const NewMuseum = () => {
       description: '',
       location: '',
       categoryId: '',
+      timeRange: [dayjs('2023-04-17T08:00'), dayjs('2023-04-17T22:00')],
       //   image: '',
     },
     validationSchema: newMuseumSchema,
@@ -76,15 +86,26 @@ const NewMuseum = () => {
   });
 
   async function submitNewMuseum(values) {
+    const openingTime = values.timeRange[0].$d.toLocaleTimeString();
+    const closingTime = values.timeRange[1].$d.toLocaleTimeString();
+
     const formData = new FormData();
     Object.keys(values).forEach((fieldName) => {
-      console.log(fieldName, values[fieldName]);
+      if (fieldName === 'timeRange') {
+        return;
+      }
+      // console.log(fieldName, values[fieldName]);
 
       formData.append(fieldName, values[fieldName]);
     });
 
+    formData.append('openingTime', openingTime);
+    formData.append('closingTime', closingTime);
     formData.append('image', image);
 
+    for (const value of formData.values()) {
+      console.log(value);
+    }
     setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:8000/museums', formData);
@@ -179,6 +200,29 @@ const NewMuseum = () => {
           helperText={addMuseumForm.errors.description}
         />
 
+        <Box sx={{ mb: 3 }}>
+          <Typography mb={1} variant="h6">
+            Opening Hours:
+          </Typography>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MultiInputTimeRangeField
+              type="date"
+              name="timeRange"
+              value={addMuseumForm.values.timeRange}
+              onChange={(value) =>
+                addMuseumForm.setFieldValue('timeRange', value)
+              }
+              // error={!!addMuseumForm.errors.timeRange}
+              slotProps={{
+                textField: ({ position }) => ({
+                  label: position === 'start' ? 'From' : 'To',
+                }),
+              }}
+            />
+          </LocalizationProvider>
+        </Box>
+
         <Button
           component="label"
           variant="outlined"
@@ -208,7 +252,7 @@ const NewMuseum = () => {
         <Box width={'100%'}>
           <div>
             {/* {!imgSrc && <p>Please Upload An image</p>} */}
-            {imgSrc && <img width={'100%'} height={300} src={imgSrc} alt='' />}
+            {imgSrc && <img width={'50%'} height={200} src={imgSrc} alt="" />}
           </div>
         </Box>
 

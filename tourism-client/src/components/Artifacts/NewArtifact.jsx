@@ -30,16 +30,51 @@ export default function NewArtifact({ open, setOpen, onAddArtifact }) {
     setOpen(false);
   };
 
-  const [imgSrc, setImgSrc] = useState(null);
-  const [image, setImage] = useState(null);
-  const onChangePicture = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-      const reader = new FileReader();
-      reader.addEventListener('load', () => {
-        setImgSrc(reader.result);
-      });
-      reader.readAsDataURL(e.target.files[0]);
+  // const [imgSrc, setImgSrc] = useState(null);
+  // const [image, setImage] = useState(null);
+
+  // const onChangePicture = (e) => {
+  //   if (e.target.files[0]) {
+  //     setImage(e.target.files[0]);
+  //     const reader = new FileReader();
+  //     reader.addEventListener('load', () => {
+  //       setImgSrc(reader.result);
+  //     });
+  //     reader.readAsDataURL(e.target.files[0]);
+  //   }
+  // };
+
+  const [imgSrcList, setImgSrcList] = useState([]);
+  const [imageList, setImageList] = useState([]);
+
+  const onChangePicture = async (e) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+
+      try {
+        const results = await Promise.all(
+          filesArray.map((file) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+
+              reader.addEventListener('load', () => {
+                resolve(reader.result);
+              });
+
+              reader.addEventListener('error', (error) => {
+                reject(error);
+              });
+
+              reader.readAsDataURL(file);
+            });
+          })
+        );
+
+        setImgSrcList(results);
+        setImageList(filesArray);
+      } catch (error) {
+        console.error('Error reading files: ', error);
+      }
     }
   };
 
@@ -59,13 +94,22 @@ export default function NewArtifact({ open, setOpen, onAddArtifact }) {
     });
 
     formData.append('museumId', museumId);
-    formData.append('image', image);
+
+    for (let i = 0; i < imageList.length; i++) {
+      formData.append('images', imageList[i]);
+    }
+
+    // formData.append('images', imageList);
+
+    console.log(imageList);
 
     try {
       setIsLoading(true);
       const res = await axios.post('http://localhost:8000/artifacts', formData);
 
-      if (res.status == 201) {
+      console.log(res);
+
+      if (res.status === 201) {
         onAddArtifact(res.data);
         setOpen(false);
       }
@@ -128,6 +172,7 @@ export default function NewArtifact({ open, setOpen, onAddArtifact }) {
                   name="image"
                   onChange={onChangePicture}
                   type="file"
+                  multiple
                   accept="image/*"
                   style={{
                     clip: 'rect(0 0 0 0)',
@@ -143,10 +188,21 @@ export default function NewArtifact({ open, setOpen, onAddArtifact }) {
                 />
               </Button>
               <Box width={'100%'}>
+                {imgSrcList.map((imgSrc, index) => (
+                  <img
+                    key={index}
+                    width={'50%'}
+                    height={150}
+                    src={imgSrc}
+                    alt={`Preview ${index}`}
+                  />
+                ))}
+
+                {/* 
                 <div>
-                  {/* {!imgSrc && <p>Please Upload An image</p>} */}
+                  {!imgSrc && <p>Please Upload An image</p>}
                   {imgSrc && <img width={'100%'} height={300} src={imgSrc} />}
-                </div>
+                </div> */}
               </Box>
             </form>
           </Box>
@@ -159,7 +215,7 @@ export default function NewArtifact({ open, setOpen, onAddArtifact }) {
             variant="contained"
             color="primary"
             type="submit"
-            disabled={!addArtifactForm.isValid || !image}
+            disabled={!addArtifactForm.isValid || !imageList.length > 0}
             loading={isLoading}
             onClick={addArtifactForm.handleSubmit}
           >

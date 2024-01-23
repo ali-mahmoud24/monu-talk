@@ -1,7 +1,5 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 
-import { Artifact } from 'src/artifacts/schemas/artifact.schema';
-
 export class GetMuseumDto {
   // @Expose({ name: 'id' }) // Expose as 'id'
   // @Transform(({ value }) => value.toString(), { toPlainOnly: true }) // Transform _id to string

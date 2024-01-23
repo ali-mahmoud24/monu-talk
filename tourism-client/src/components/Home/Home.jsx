@@ -41,7 +41,7 @@ const Home = () => {
                   than 120,000 objects.
                 </p>
                 <Link
-                  to={'/artifacts/657641ba603698b1f5d1d8b6'}
+                  to={'/artifacts/3d45124c-95b6-4efc-b972-b4d05423de82'}
                   className="btn btn-primary"
                 >
                   Check Here
@@ -66,7 +66,7 @@ const Home = () => {
                   most popular pharaoh, King Tutankhamun.
                 </p>
                 <Link
-                  to={'/artifacts/657646a6603698b1f5d1d940'}
+                  to={'/artifacts/70c7d560-9105-49cd-8f2a-2693c5216728'}
                   className="btn btn-primary"
                 >
                   Check Here
@@ -92,7 +92,7 @@ const Home = () => {
                   religion.
                 </p>
                 <Link
-                  to={'/artifacts/6576434a603698b1f5d1d8e0'}
+                  to={'/artifacts/c4a91945-c9d7-4fd9-893a-d727fb0d92a5'}
                   className="btn btn-primary"
                 >
                   Check Here
@@ -117,7 +117,7 @@ const Home = () => {
                   Egyptian antiquities, manuscripts, the history of science
                 </p>
                 <Link
-                  to={'/artifacts/65764580603698b1f5d1d910'}
+                  to={'/artifacts/b8877c8d-f8d2-439a-8cae-15cb17b851b6'}
                   className="btn btn-primary"
                 >
                   Check Here
@@ -143,7 +143,7 @@ const Home = () => {
                   Ramses I and Ahmose I.
                 </p>
                 <Link
-                  to={'/artifacts/657644aa603698b1f5d1d8fe'}
+                  to={'/artifacts/f581192e-f776-426e-a942-94d22d6df7c7'}
                   className="btn btn-primary"
                 >
                   Check Here

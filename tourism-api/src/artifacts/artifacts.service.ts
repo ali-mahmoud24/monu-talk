@@ -4,32 +4,33 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 
-import { Artifact, ArtifactDocument } from './schemas/artifact.schema';
-import { Model } from 'mongoose';
+import { Artifact } from './entities/artifact.entity';
 
 import { CreateArtifactDto } from './dtos/create-artifact.dto';
 import { UpdateArtifactDto } from './dtos/update-artifact.dto';
 import { MuseumService } from '../museums/museums.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { image } from '@tensorflow/tfjs';
 
 @Injectable()
 export class ArtifactService {
   constructor(
-    @InjectModel(Artifact.name) private artifactModel: Model<Artifact>,
-    @Inject(forwardRef(() => MuseumService))
+    @InjectRepository(Artifact)
+    private readonly artifactRepository: Repository<Artifact>,
     private readonly museumService: MuseumService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async findArtifacts(): Promise<Artifact[]> {
-    const artifacts = await this.artifactModel.find();
+    const artifacts = await this.artifactRepository.find();
     return artifacts;
   }
 
   async findArtifactById(id: string): Promise<Artifact> {
-    const artifact = await this.artifactModel.findById(id);
+    const artifact = await this.artifactRepository.findOneBy({ id });
     if (!artifact) {
       throw new NotFoundException(`No artifact found with this ${id}.`);
     }
@@ -37,34 +38,44 @@ export class ArtifactService {
   }
 
   async findArtifactsByMuseumId(museumId: string): Promise<Artifact[]> {
-    const loadedMuseum =
-      await this.museumService.findMuseumEntityById(museumId);
+    const loadedMuseum = await this.museumService.findMuseumById(museumId);
 
-    if (!loadedMuseum) {
-      throw new NotFoundException(`No Museum found with this ${museumId}.`);
-    }
-
-    const artifacts = await this.artifactModel.find({ museumId });
+    const artifacts = await this.artifactRepository.find({
+      where: { museumId },
+    });
     return artifacts;
   }
 
   async createArtifact(
     createArtifactDto: CreateArtifactDto,
+    images: Express.Multer.File[],
   ): Promise<Artifact> {
     const { museumId } = createArtifactDto;
-    const loadedMuseum =
-      await this.museumService.findMuseumEntityById(museumId);
+    const loadedMuseum = await this.museumService.findMuseumById(museumId);
 
-    if (!loadedMuseum) {
-      throw new NotFoundException(
-        `No Museum found with this ${createArtifactDto.museumId}.`,
-      );
-    }
+    console.log('images');
+    console.log(images);
 
-    const newArtifact = await this.artifactModel.create(createArtifactDto);
+    // Upload Images to Cloudinary
+    const uploadMultiResponse =
+      await this.cloudinaryService.uploadManyFiles(images);
 
-    loadedMuseum.artifactsIds.push(newArtifact.id);
-    await loadedMuseum.save();
+    console.log('res');
+    console.log(uploadMultiResponse);
+
+    const urls = uploadMultiResponse.map((res) => res.url);
+
+    console.log('urls');
+    console.log(urls);
+
+    const newArtifact = this.artifactRepository.create({
+      ...createArtifactDto,
+      imageUrlList: urls,
+    });
+
+    console.log(newArtifact);
+
+    await this.artifactRepository.save(newArtifact);
 
     return newArtifact;
   }
@@ -73,37 +84,20 @@ export class ArtifactService {
     id: string,
     updateArtifactDto: UpdateArtifactDto,
   ): Promise<Artifact> {
-    const updatedArtifact = await this.artifactModel.findByIdAndUpdate(
-      id,
-      updateArtifactDto,
-      { new: true },
-    );
+    // 1) find Artifact to update
+    const artifactToUpdate = await this.findArtifactById(id);
 
-    return updatedArtifact;
+    // 2) update the Artifact
+    const updatedArtifact = { ...artifactToUpdate, ...updateArtifactDto };
+
+    return this.artifactRepository.save(updatedArtifact);
   }
 
-  async deleteArtifact(artifactId: string): Promise<void> {
-    const { imageUrl, museumId } = await this.findArtifactById(artifactId);
+  async deleteArtifact(id: string): Promise<void> {
+    const { imageUrlList } = await this.findArtifactById(id);
 
-    await this.cloudinaryService.deleteFileByImageUrl(imageUrl);
+    await this.cloudinaryService.deleteManyFilesByImageUrl(imageUrlList);
 
-    await this.artifactModel.findByIdAndDelete(artifactId);
-
-    const loadedMuseum =
-      await this.museumService.findMuseumEntityById(museumId);
-
-    loadedMuseum.artifactsIds = loadedMuseum.artifactsIds.filter(
-      (id) => id.toString() !== artifactId,
-    );
-
-    await loadedMuseum.save();
-  }
-
-  async findArtifactEntityById(id: string): Promise<ArtifactDocument> {
-    const artifactDoc = await this.artifactModel.findById(id);
-    if (!artifactDoc) {
-      throw new NotFoundException(`No artifact found with this ${id}.`);
-    }
-    return artifactDoc;
+    await this.artifactRepository.delete({ id });
   }
 }

@@ -66,6 +66,7 @@ function Navigation() {
     <AppBar
       position="static"
       // style={{ background: 'transparent', boxShadow: 'none' }}
+      style={{ backgroundColor: '#000' }}
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>

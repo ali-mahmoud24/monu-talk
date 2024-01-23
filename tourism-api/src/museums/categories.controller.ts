@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
-import { Category } from './schemas/category.schema';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Category } from './entities/category.entity';
 import { CategoryService } from './categories.service';
+import { CreateCategoryDto } from './dtos/create-category-dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -9,5 +10,12 @@ export class CategoriesController {
   @Get()
   async findAll(): Promise<Category[]> {
     return this.categoryService.findCategories();
+  }
+  @Post()
+  async create(
+    @Body()
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<Category> {
+    return this.categoryService.createCategory(createCategoryDto);
   }
 }
