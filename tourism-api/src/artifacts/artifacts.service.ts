@@ -13,7 +13,6 @@ import { MuseumService } from '../museums/museums.service';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { image } from '@tensorflow/tfjs';
 
 @Injectable()
 export class ArtifactService {

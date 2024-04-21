@@ -5,9 +5,6 @@ import {
   BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestJs/mongoose';
-
-import mongoose, { Model } from 'mongoose';
 
 import { JwtService } from '@nestjs/jwt';
 
