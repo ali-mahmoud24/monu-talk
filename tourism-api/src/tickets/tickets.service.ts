@@ -31,10 +31,19 @@ export class TicketsService {
   }
 
   async findTicketsByMuseumId(museumId: string): Promise<Ticket[]> {
-    const loadedMuseum = await this.museumService.findMuseumById(museumId);
+    // const loadedMuseum = await this.museumService.findMuseumById(museumId);
 
     const tickets = await this.ticketRepository.find({
       where: { museumId },
+    });
+    return tickets;
+  }
+
+  async findTicketsByUserId(userId: string): Promise<Ticket[]> {
+    // const loadedUser = await this.museumService.findMuseumById(userId);
+
+    const tickets = await this.ticketRepository.find({
+      where: { userId },
     });
     return tickets;
   }
@@ -58,9 +67,9 @@ export class TicketsService {
   }
 
   async deleteTicket(id: string): Promise<void> {
-    const { imageUrl } = await this.findTicketById(id);
+    // const { imageUrl } = await this.findTicketById(id);
 
-    await this.cloudinaryService.deleteFileByImageUrl(imageUrl);
+    // await this.cloudinaryService.deleteFileByImageUrl(imageUrl);
 
     await this.ticketRepository.delete({ id });
   }

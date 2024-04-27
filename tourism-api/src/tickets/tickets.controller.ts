@@ -27,14 +27,14 @@ export class TicketsController {
   ) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  // @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() createTicketDto: CreateTicketDto,
-    @UploadedFile() image: Express.Multer.File,
+    // @UploadedFile() image: Express.Multer.File,
   ): Promise<Ticket> {
     // Upload Image to Cloudinary
-    const { url } = await this.cloudinaryService.uploadFile(image);
-    createTicketDto.imageUrl = url;
+    // const { url } = await this.cloudinaryService.uploadFile(image);
+    // createTicketDto.imageUrl = url;
 
     return this.ticketsService.createTicket(createTicketDto);
   }
@@ -50,6 +50,15 @@ export class TicketsController {
   ): Promise<Ticket[]> {
     return this.ticketsService.findTicketsByMuseumId(museumId);
   }
+
+
+  @Get('users/:userId')
+  async findByUserId(
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<Ticket[]> {
+    return this.ticketsService.findTicketsByUserId(userId);
+  }
+
 
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Ticket> {

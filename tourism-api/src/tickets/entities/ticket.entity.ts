@@ -22,8 +22,8 @@ export class Ticket {
   //   @Column({ type: 'decimal', precision: 10, scale: 2 })
   //   price: number;
 
-  //   @Column()
-  //   quantity: number;
+  @Column()
+  quantity: number;
 
   @Column()
   phoneNumber: string;
@@ -31,8 +31,8 @@ export class Ticket {
   @Column()
   nationality: string;
 
-  @Column()
-  imageUrl: string;
+  // @Column()
+  // imageUrl: string;
 
   @Column()
   museumId: string;

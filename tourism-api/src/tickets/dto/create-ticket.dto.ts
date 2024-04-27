@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 export class CreateTicketDto {
   @IsNotEmpty()
@@ -10,11 +10,16 @@ export class CreateTicketDto {
   phoneNumber: string;
 
   @IsNotEmpty()
+  @IsNumber()
+  @Min(0)
+  quantity: number;
+
+  @IsNotEmpty()
   @IsString()
   nationality: string;
 
-  @IsString()
-  imageUrl: string = '';
+  // @IsString()
+  // imageUrl: string = '';
 
   @IsNotEmpty()
   @IsString()

@@ -33,7 +33,7 @@ const ImageModel = () => {
     const formData = new FormData();
     formData.append('image', image);
 
-    const remoteServerUrl = 'https://3ca8-104-196-70-107.ngrok-free.app';
+    const remoteServerUrl = 'https://5d76-35-201-247-81.ngrok-free.app';
 
     try {
       setIsLoading(true);
@@ -43,6 +43,7 @@ const ImageModel = () => {
         setData(res.data);
       }
     } catch (err) {
+      setIsLoading(false);
       console.log(err);
     } finally {
       setIsLoading(false);
@@ -51,7 +52,7 @@ const ImageModel = () => {
 
   return (
     <>
-      <Box sx={{ width: '50%', margin: '0 auto' }}>
+      <Box sx={{ width: '30%', margin: '0 auto' }}>
         <Typography variant="h4" sx={{ marginBottom: '1rem' }}>
           Upload Image to predict Monument:
         </Typography>
