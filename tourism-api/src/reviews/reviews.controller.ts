@@ -26,7 +26,7 @@ export class ReviewsController {
   }
 
   @Get()
-  findAll(): Promise<Review[]> {
+  findAll() {
     return this.reviewsService.findReviews();
   }
 

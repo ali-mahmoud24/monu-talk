@@ -17,9 +17,23 @@ export class TicketsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async findTickets(): Promise<Ticket[]> {
-    const tickets = await this.ticketRepository.find();
-    return tickets;
+  async findTickets() {
+    const tickets = await this.ticketRepository.find({
+      relations: { museum: true },
+    });
+
+    const mappedTickets = tickets.map((ticket) => {
+      const mappedTicket = {
+        museumName: ticket.museum.name,
+        ...ticket,
+      };
+
+      delete mappedTicket.museum;
+
+      return mappedTicket;
+    });
+
+    return mappedTickets;
   }
 
   async findTicketById(id: string): Promise<Ticket> {
@@ -40,12 +54,23 @@ export class TicketsService {
   }
 
   async findTicketsByUserId(userId: string): Promise<Ticket[]> {
-    // const loadedUser = await this.museumService.findMuseumById(userId);
-
     const tickets = await this.ticketRepository.find({
       where: { userId },
+      relations: { museum: true },
     });
-    return tickets;
+
+    const mappedTickets = tickets.map((ticket) => {
+      const mappedTicket = {
+        museumName: ticket.museum.name,
+        ...ticket,
+      };
+
+      delete mappedTicket.museum;
+
+      return mappedTicket;
+    });
+
+    return mappedTickets;
   }
 
   async createTicket(createTicketDto: CreateTicketDto): Promise<Ticket> {

@@ -73,4 +73,24 @@ export class AuthService {
 
     return { token, userId: loadedUser.id };
   }
+
+  async getUserInfo(
+    userId: string,
+  ): Promise<{ firstName: string; lastName: string; email: string }> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+  }
+
+  async getUserFullName(userId: string): Promise<string> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    const fullName = `${user.firstName} ${user.lastName}`;
+
+    return fullName;
+  }
 }

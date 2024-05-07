@@ -7,17 +7,42 @@ import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
 
 import { MuseumService } from '../museums/museums.service';
+import { AuthService } from 'src/auth/auth.service';
+import { plainToInstance } from 'class-transformer';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     private readonly museumService: MuseumService,
+    private readonly authService: AuthService,
   ) {}
 
-  async findReviews(): Promise<Review[]> {
-    const tickets = await this.reviewRepository.find();
-    return tickets;
+  async findReviews() {
+    const reviews = await this.reviewRepository.find({
+      relations: { museum: true },
+    });
+
+    const mappedReviews = await Promise.all(
+      reviews.map(async (review) => {
+        const userName = await this.authService.getUserFullName(review.userId);
+
+        const mappedReview: any = {
+          userName,
+          museumName: review.museum.name,
+          ...review,
+        };
+
+        delete mappedReview.museumId;
+        delete mappedReview.userId;
+        delete mappedReview.museum;
+
+        return mappedReview;
+      }),
+    );
+
+    return mappedReviews;
   }
 
   async findReviewById(id: string): Promise<Review> {
@@ -29,12 +54,31 @@ export class ReviewsService {
   }
 
   async findReviewsByMuseumId(museumId: string): Promise<Review[]> {
-    const loadedMuseum = await this.museumService.findMuseumById(museumId);
-
     const reviews = await this.reviewRepository.find({
       where: { museumId },
+      relations: { museum: true },
     });
-    return reviews;
+
+    const mappedReviews = await Promise.all(
+      reviews.map(async (review) => {
+        const userName = await this.authService.getUserFullName(review.userId);
+
+        const mappedReview: any = {
+          userName,
+          museumName: review.museum.name,
+          ...review,
+        };
+
+        delete mappedReview.museumId;
+        delete mappedReview.userId;
+        delete mappedReview.museum;
+
+        return mappedReview;
+      }),
+    );
+
+    return mappedReviews;
+
   }
 
   async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
