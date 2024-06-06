@@ -74,6 +74,14 @@ export class TicketsService {
   }
 
   async createTicket(createTicketDto: CreateTicketDto): Promise<Ticket> {
+    const { ticketPrice } = await this.museumService.findMuseumById(
+      createTicketDto.museumId,
+    );
+
+    const totalPrice = ticketPrice * createTicketDto.quantity;
+
+    createTicketDto.totalPrice = totalPrice;
+
     const newTicket = await this.ticketRepository.save(createTicketDto);
     return newTicket;
   }

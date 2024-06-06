@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateMuseumDto {
   @IsNotEmpty()
@@ -12,6 +12,10 @@ export class CreateMuseumDto {
   @IsNotEmpty()
   @IsString()
   readonly closingTime: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  readonly ticketPrice: number;
 
   @IsNotEmpty()
   @IsString()

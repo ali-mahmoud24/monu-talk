@@ -30,6 +30,9 @@ export class Museum {
   @Column({ type: 'time' })
   closingTime: string;
 
+  @Column({ type: 'numeric' })
+  ticketPrice: number;
+
   @Column()
   categoryId: string;
 

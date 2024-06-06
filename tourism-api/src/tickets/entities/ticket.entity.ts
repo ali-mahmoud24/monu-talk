@@ -25,6 +25,9 @@ export class Ticket {
   @Column()
   quantity: number;
 
+  @Column({ nullable: true })
+  totalPrice: number;
+
   @Column()
   phoneNumber: string;
 

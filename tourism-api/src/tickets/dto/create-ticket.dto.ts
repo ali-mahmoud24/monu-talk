@@ -14,6 +14,12 @@ export class CreateTicketDto {
   @Min(0)
   quantity: number;
 
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @Min(0)
+  totalPrice: number;
+
+
   @IsNotEmpty()
   @IsString()
   nationality: string;

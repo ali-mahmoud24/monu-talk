@@ -17,6 +17,7 @@ export class MuseumService {
     const museums = await this.museumRepository.find({
       relations: { category: true },
     });
+
     return museums;
   }
 

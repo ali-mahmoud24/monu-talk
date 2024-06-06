@@ -51,14 +51,12 @@ export class TicketsController {
     return this.ticketsService.findTicketsByMuseumId(museumId);
   }
 
-
   @Get('users/:userId')
   async findByUserId(
     @Param('userId', ParseUUIDPipe) userId: string,
   ): Promise<Ticket[]> {
     return this.ticketsService.findTicketsByUserId(userId);
   }
-
 
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Ticket> {
