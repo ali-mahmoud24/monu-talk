@@ -11,6 +11,8 @@ import {
   ParseUUIDPipe,
   UseInterceptors,
   UploadedFile,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
@@ -54,8 +56,15 @@ export class TicketsController {
   @Get('users/:userId')
   async findByUserId(
     @Param('userId', ParseUUIDPipe) userId: string,
+    @Query('date') date: string,
   ): Promise<Ticket[]> {
-    return this.ticketsService.findTicketsByUserId(userId);
+    if (date !== 'prev' && date !== 'upcoming') {
+      throw new BadRequestException(
+        'Invalid query parameter. Use "prev" or "upcoming".',
+      );
+    }
+
+    return this.ticketsService.findTicketsByUserId(userId, date);
   }
 
   @Get(':id')

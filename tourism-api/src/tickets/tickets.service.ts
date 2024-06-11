@@ -53,13 +53,27 @@ export class TicketsService {
     return tickets;
   }
 
-  async findTicketsByUserId(userId: string): Promise<Ticket[]> {
+  async findTicketsByUserId(userId: string, date: string): Promise<Ticket[]> {
     const tickets = await this.ticketRepository.find({
       where: { userId },
       relations: { museum: true },
     });
 
-    const mappedTickets = tickets.map((ticket) => {
+    const now = new Date();
+
+    let filteredTickets: Ticket[];
+
+    if (date === 'prev') {
+      filteredTickets = tickets.filter(
+        (ticket) => new Date(ticket.ticketDate) < now,
+      );
+    } else if (date === 'upcoming') {
+      filteredTickets = tickets.filter(
+        (ticket) => new Date(ticket.ticketDate) >= now,
+      );
+    }
+
+    const mappedTickets = filteredTickets.map((ticket) => {
       const mappedTicket = {
         museumName: ticket.museum.name,
         ...ticket,
