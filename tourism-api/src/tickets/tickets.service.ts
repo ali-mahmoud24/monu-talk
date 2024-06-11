@@ -56,6 +56,7 @@ export class TicketsService {
   async findTicketsByUserId(userId: string, date: string): Promise<Ticket[]> {
     const tickets = await this.ticketRepository.find({
       where: { userId },
+      order: { ticketDate: 'DESC' },
       relations: { museum: true },
     });
 
