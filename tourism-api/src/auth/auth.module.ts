@@ -9,9 +9,11 @@ import { AuthService } from './auth.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    CloudinaryModule,
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
