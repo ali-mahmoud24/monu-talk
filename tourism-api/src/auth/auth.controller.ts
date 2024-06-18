@@ -45,9 +45,9 @@ export class AuthController {
     return this.authService.updateUserInfo(id, updateUserInfoDto);
   }
 
-  @Patch('upload-image/:id')
+  @Patch('update-image/:id')
   @UseInterceptors(FileInterceptor('image'))
-  uploadUserImage(
+  updateUserImage(
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() image: Express.Multer.File,
   ) {
