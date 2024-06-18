@@ -30,7 +30,7 @@ export class Museum {
   @Column({ type: 'time' })
   closingTime: string;
 
-  @Column({ type: 'numeric' })
+  @Column({ nullable: true })
   ticketPrice: number;
 
   @Column()

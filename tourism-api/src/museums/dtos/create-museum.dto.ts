@@ -14,7 +14,7 @@ export class CreateMuseumDto {
   readonly closingTime: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   readonly ticketPrice: number;
 
   @IsNotEmpty()
