@@ -56,6 +56,7 @@ export class ReviewsService {
   async findReviewsByMuseumId(museumId: string): Promise<Review[]> {
     const reviews = await this.reviewRepository.find({
       where: { museumId },
+      order: { createdAt: 'ASC' },
       relations: { museum: true },
     });
 
@@ -78,7 +79,6 @@ export class ReviewsService {
     );
 
     return mappedReviews;
-
   }
 
   async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
