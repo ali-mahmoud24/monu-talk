@@ -55,7 +55,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: newUser.id });
 
-    return { token, userId: newUser.id };
+    return { token, userId: newUser.id, imageUrl: newUser.imageUrl };
   }
 
   async login(
@@ -77,7 +77,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: loadedUser.id });
 
-    return { token, userId: loadedUser.id };
+    return { token, userId: loadedUser.id, imageUrl: loadedUser.imageUrl };
   }
 
   async getUserInfo(userId: string): Promise<GetUserInfoDto> {

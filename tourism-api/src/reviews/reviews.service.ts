@@ -35,7 +35,7 @@ export class ReviewsService {
         };
 
         delete mappedReview.museumId;
-        delete mappedReview.userId;
+        // delete mappedReview.userId;
         delete mappedReview.museum;
 
         return mappedReview;
@@ -71,7 +71,7 @@ export class ReviewsService {
         };
 
         delete mappedReview.museumId;
-        delete mappedReview.userId;
+        // delete mappedReview.userId;
         delete mappedReview.museum;
 
         return mappedReview;
