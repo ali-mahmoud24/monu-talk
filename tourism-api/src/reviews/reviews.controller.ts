@@ -33,7 +33,7 @@ export class ReviewsController {
   @Get('museums/:museumId')
   async findByMuseumId(
     @Param('museumId', ParseUUIDPipe) museumId: string,
-  ): Promise<Review[]> {
+  ){
     return this.reviewsService.findReviewsByMuseumId(museumId);
   }
 

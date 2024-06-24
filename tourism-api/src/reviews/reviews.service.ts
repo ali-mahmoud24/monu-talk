@@ -8,8 +8,6 @@ import { Review } from './entities/review.entity';
 
 import { MuseumService } from '../museums/museums.service';
 import { AuthService } from 'src/auth/auth.service';
-import { plainToInstance } from 'class-transformer';
-import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class ReviewsService {
@@ -53,16 +51,21 @@ export class ReviewsService {
     return review;
   }
 
-  async findReviewsByMuseumId(museumId: string): Promise<Review[]> {
+  async findReviewsByMuseumId(museumId: string) {
     const reviews = await this.reviewRepository.find({
       where: { museumId },
       order: { createdAt: 'ASC' },
       relations: { museum: true },
     });
 
+    let ratingSum = 0;
+    const reviewsCount = reviews.length;
+
     const mappedReviews = await Promise.all(
       reviews.map(async (review) => {
         const userName = await this.authService.getUserFullName(review.userId);
+
+        ratingSum = ratingSum + review.rating;
 
         const mappedReview: any = {
           userName,
@@ -78,7 +81,9 @@ export class ReviewsService {
       }),
     );
 
-    return mappedReviews;
+    const avgRating = (ratingSum / reviewsCount).toFixed(1);
+
+    return { reviews: mappedReviews, avgRating };
   }
 
   async createReview(createReviewDto: CreateReviewDto): Promise<Review> {
